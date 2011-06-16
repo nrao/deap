@@ -1,0 +1,143 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+    <link href="deap.css" rel="stylesheet" type="text/css" />
+    <title>
+      deap.sourceforge.net
+    </title>
+  </head>
+  <body>
+    <div class="header">
+      <a href="http://deap.sourceforge.net/">deap.sourceforge.net</a>
+    </div>
+    <div class="menu">
+		  <a href="http://sourceforge.net/projects/deap/">Project</a><br />
+			<a href="about.html">About</a><br />
+			<a href="faq.html">FAQ</a><br />
+			<a href="screenshots.html">Screen Shots</a><br />
+			<a href="help/index.html">Documentation</a><br />
+			<a href="http://sourceforge.net/project/showfiles.php?group_id=92078">Download</a><br />
+			<a href="install.html">Install</a><br />
+			<a href="http://wiki.gb.nrao.edu/bin/view/Software/DEAP">Wiki</a><br />
+			<a href="participants.html">Participants</a><br />
+			<a href="links.html">Links</a><br />
+    </div>
+    <div class="content">
+		  <p>
+			  The install instructions below are divided into two main sections.  The
+				first section discusses installing the binary DEAP package on Windows.
+				The second section describes how to build DEAP from source, and is
+				applicable to both Windows and Linux.
+			</p>
+			
+			<div align="center">
+			  [ <a href="#binary">Binary Installation</a> (Windows Only) |
+				  <a href="#source">Source Installation</a> (Windows / Linux) ]
+			</div>
+
+			<hr />			
+			<a name="binary">Binary Installation</a>
+			
+			<p>
+			  Installing the binary version of DEAP is mainly about getting the
+			  prerequisites.  DEAP requires:
+			</p>
+			
+			<ol>
+			  <li><a href="http://www.python.org/">Python</a></li>
+				<li><a href="http://www.pfdubois.com/numpy/">Numerical Python</a></li>
+				<li><a href="http://www.wxpython.org">wxPython</a>
+			</ol>
+			
+			<p>
+			  So, step 1 involves downloading and installing these three prerequisites.
+			  After doing this, it is a good idea to ensure that the python executable
+			  is in your path.
+			</p>
+			
+			<p>
+			  Step 2: unzip the deap-win32-binary-1.0.zip available from our downloads
+			  area.  Run "deap.bat" and enjoy.
+			</p>
+			
+			<hr />			
+			<a name="source">Source Installation</a>
+			
+			<p>
+			  The source installation is also primarily about prequisites, but in this
+			  case things are a little more complicated.  First, we'll cover the
+				easy prerequisites:
+			</p>
+			
+			<ol>
+			  <li><a href="http://www.python.org/">Python</a>
+				<li><a href="http://www.pfdubois.com/numpy/">Numerical Python</a></li>
+				<li><a href="http://www.wxpython.org">wxPython</a>
+			</ol>
+			
+			<p>
+			  Be sure to get a source distribution of wxPython and build it
+				locally.  We need the source to build the pgplot driver, which
+				is the next step.
+			</p>
+			
+			<p>
+			  Get the pgplot source distribution from
+				<a href="http://www.astro.caltech.edu/~tjp/pgplot/">http:/www.astro.caltech.edu/~tjp/pgplot/</a>
+				and the pgplot patch from our download area.  Unzip the patch over the 5.2
+				source distribution - it replaces a few files and adds our driver.  Having
+				applied the DEAP patch, you can then proceed to follow the pgplot installation
+				instructions at:
+				<a href="http://www.astro.caltech.edu/~tjp/pgplot/install.html">http://www.astro.caltech.edu/~tjp/pgplot/install.html</a>.
+				Set the WXWIN environment variable to point to the top of your wxPython
+				source tree and be sure to build the "wxPlot" driver - that's what we're
+				after.				
+			</p>
+			
+			<p>
+			  <em>Windows users please note:</em>  Building pgplot
+				for Windows has never been an easy proposition, but it's doable.  If you
+				don't want to do it, please see our <a href="#binary">binary</a> installation
+				instructions.  You will need a Windows C++ compiler (Visual C++ 6.0 or later
+				is best) and <a href="http://www.netlib.org/f2c/">f2c</a>.  Having installed
+				f2c, you can follow the pgplot
+				<a href="http://www.astro.caltech.edu/~tjp/pgplot/install.html">install</a>
+				instructions for Unix users - but use "makemake.win32" instead of the Unix
+				"makemake".  Sounds painful?  It is.				
+			</p>
+			
+			<p>
+			  The next prequisite you need in order to build DEAP from source is
+				the <a href="http://sources.redhat.com/gsl/">GNU Scientific Library</a>.
+				Linux users please follow the GSL installation instructions.  Windows
+				users may find it easier to download the GSL setup program from our
+				file area.  It's an installer, run it.
+			</p>
+			
+			<p>
+			  That's it for the prereqs!  Now we can build DEAP itself.  Get the
+				DEAP source, either from our file area or from CVS.  Find the most
+				appropriate makefile in the "admin" directory and copy it to the
+				root as "config.mak".  Edit this makefile as necessary for your local
+				system.  Then, using a recent version of GNU make, just type "make"
+				and "make install" at the top level.  You're finally ready to play
+				with DEAP: "python deap.py".
+			</p>
+			
+			<p align="right">
+			  <a href="http://sourceforge.net/">
+				  <img src="http://sourceforge.net/sflogo.php?group_id=92078&type=1" border="0">
+				</a>
+			</p>
+
+    </div>
+    <div class="footer">
+      <hr />
+      Last modified: Mar 19, 2004<br />
+      <address>
+        <a href="mailto:eric@sonic-weasel.org">Eric Sessoms &lt;eric@sonic-weasel.org&gt;</a>
+      </address>
+    </div>
+  </body>
+</html>

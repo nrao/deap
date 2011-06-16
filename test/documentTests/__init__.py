@@ -1,0 +1,3 @@
+from DocumentTest import DocumentTestCase
+from ImageElementTest import ImageElementTestCase
+

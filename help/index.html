@@ -1,0 +1,482 @@
+<html>
+<head>
+    <title>DEAP User's Manual</title>
+</head>
+<body>
+<h1>DEAP User's Manual</h1>
+<hr>
+<a href="#CommandLine"><b>1. Command Line</b></a>
+<ul>
+    <li><a href="#clear"><b>clear</b></a> </li>
+    <li><a href="#draw"><b>draw</b></a> </li>
+    <li><a href="#export"><b>export</b></a> </li>
+    <li><a href="#freeze"><b>freeze</b></a> </li>
+    <li><a href="#get_figure"><b>get_figure</b></a> </li>
+    <li><a href="#get_subplot"><b>get_subplot</b></a> </li>
+    <li><a href="#hold"><b>hold</b></a> </li>
+    <li><a href="#open_file"><b>open_file</b></a> </li>
+    <li><a href="#redo"><b>redo</b></a> </li>
+    <li><a href="#undo"><b>undo</b></a> </li>
+</ul>
+<p>
+<a href="#PlotPanel"><b>2. Plotting Panel Toolbar</b></a>
+<ul>
+  <li><a href="#GUIOpen"><b>Open</b></a> </li>
+  <li><a href="#GUISave"><b>Save</b></a> </li>
+  <li><a href="#GUIPrint"><b>Print</b></a> </li>
+  <li><a href="#GUIExport"><b>Export</b></a> </li>
+  <li><a href="#GUIUnfreeze"><b>Unfreeze</b></a> </li>
+  <li><a href="#GUIUndo"><b>Undo</b></a> </li>
+  <li><a href="#GUIRedo"><b>Redo</b></a> </li>
+  <li><a href="#GUIUnzoom"><b>Unzoom</b></a> </li>
+  <li><a href="#GUIRezoom"><b>Rezoom</b></a> </li>
+  <li><a href="#GUIInfo"><b>Info Tool</b></a> </li>
+  <li><a href="#GUIZoom"><b>Zoom Tool</b></a> </li>
+  <li><a href="#GUIPan"><b>Pan Tool</b></a> </li>
+  <li><a href="#GUIUserManual"><b>User Manual</b></a> </li>
+</ul>
+</p>
+<p>
+<a href="#Menus"><b>3. Menus</b></a>
+<ul>
+  <li><a href="#FileMenu"><b>File Menu</b></a> </li>
+  <li><a href="#EditMenu"><b>Edit Menu</b></a> </li>
+  <li><a href="#ViewMenu"><b>View Menu</b></a> </li>
+  <li><a href="#ToolsMenu"><b>Tools Menu</b></a> </li>
+  <li><a href="#HelpMenu"><b>Help Menu</b></a> </li>
+</ul>
+</p>
+
+<hr>
+<h2><a name="CommandLine">DEAP Command Line</a>
+</h2>
+<p>
+The command line is a slightly modified version of the wxPython shell, which
+is a Python interpreter.  The command line is an interactive vehicle for
+plotting and anything else that you desire.  All installed Python modules are
+available from the command line.  Additionally, the command line is augmented
+with several functions mentioned below to support plotting.  
+</p>
+<p>
+More information about Python and its syntax is available at the
+<A HREF="http://www.python.org">Python website</A>.
+</p>
+<p>
+<a name="clear"></a><b>draw()</b>
+<ul>
+    Clears the plotting canvas.
+</ul>
+</p>
+<p>
+<a name="draw"></a><b>draw()</b>
+<ul>
+    Generates a redraw event, which refreshes the plot.
+</ul>
+</p>
+<p>
+<a name="export"></a><b>export(file)</b>
+<ul>
+    Allows the user to save the figure displayed in the plotting panel to a
+    file.  Supported graphical formats are: Encapsulated Postscript and PNG.
+    This functionality is also available via File->Export and via the toolbar.
+</ul>
+</p>
+<p>
+<a name="freeze"></a><b>freeze(message = None)</b>
+<ul>
+    Freezes further processing of the command line until the
+    application receives an unfreeze via the GUI. The message
+    argument, when supplied, is a string which is translated into
+    a message dialog that is displayed to the user reminding him/her
+    that a "freeze" command has been issued. If the message string 
+    is not supplied, no dialog is displayed before the command line
+    is frozen.
+    <pre>
+    Eg.
+    freeze()             # Freezes the command line - no message dialog
+    freeze("my message") # Freezes the command line & displays dialog
+                         # containing the string, "my message"
+    </pre>
+</ul>
+</p>
+<p>
+<a name="get_figure"></a><b>get_figure()</b>
+<ul>
+    Returns the matplotlib figure object associated with the plotting area. 
+    The matplotlib figure is the entry point for all plotting functionality.  
+    To learn more about the plotting capabilities of matplotlib, visit the
+    <A HREF="http://matplotlib.sourceforge.net">matplotlib website</A>.
+</ul>
+</p>
+<p>
+<a name="get_subplot"></a><b>get_subplot(index = None)</b>
+<ul>
+    Returns either the indicated subplot object or a list of all subplot
+    object contained in the figure object (when the index is not 
+    specified).  The index argument is an integer which represents the
+    subplot number within the figure object.  Note that subplot indexing
+    begins at zero.
+
+    <pre>
+    Eg.
+    get_subplot()   # Return a list of all subplot objects
+    get_subplot(0)  # Returns the first subplot object
+    </pre>
+
+    To learn more about the plotting capabilities of matplotlib, visit the
+    <A HREF="http://matplotlib.sourceforge.net">matplotlib website</A>.
+    subplot objects have all the properties of axes objects.
+</ul>
+</p>
+<p>
+<a name="hold"></a><b>hold(b = None)</b>
+<ul>
+    Set the hold state.  If hold is None (default), toggle the
+    hold state.  Else set the hold state to boolean value b.
+    This controls both the matplotlib figure object and the GUI window.
+    <pre>
+    Eg.
+    hold()      # toggle hold
+    hold(True)  # hold is on
+    hold(False) # hold is off
+    </pre>
+</ul>
+</p>
+<p>
+<a name="open_file"></a><b>open_file(file)</b>
+<ul>
+    Opens a previously saved session or user-created file containing DEAP 
+    commands.  file is a string containing the path to the desired file.
+</ul>
+</p>
+<p>
+<a name="redo"></a><b>redo()</b>
+<ul>
+    Redoes the last command typed in the interactive shell.
+</ul>
+</p>
+<p>
+<a name="undo"></a><b>undo()</b>
+<ul>
+    Undoes the last command typed in the interactive shell.
+</ul>
+</p>
+
+<hr>
+
+<h2><a name="PlotPanel">Plotting Panel Toolbar</a>
+</h2>
+<p>
+The plotting panel allows user interactions with the plots.  The toolbar
+simplifies access to the available interactive plot functions.
+</p>
+<p><a name="GUIOpen"></a><img src="Open.bmp"><b>Open</b>
+<ul>
+    Displays the open file dialog and allows the
+    user to open a previously saved session or to import a user-created
+    file containing DEAP commands. This functionality is also available
+    via File->Open.
+</ul>
+</p>
+<p><a name="GUISave"></a><img src="Save.bmp"><b>Save</b>
+<ul>
+    Displays the save file dialog if a file has not
+    been previously opened or saved and allows the user to save the current
+    session to a new .txt file.  If a file has been previously opened or
+    saved, that file is automatically overwritten with the current
+    command line history. This functionality is also available via File->Save.
+</ul>
+</p>
+<p><a name="GUIPrint"></a><img src="Print.bmp"><b>Print</b>
+<ul>
+    Displays the print dialog and allows the user
+    to print the figure displayed in the plotting panel.  This functionality
+    is also available via File->Print.
+</ul>
+</p>
+<p><a name="GUIExport"></a><img src="Export.bmp"><b>Export</b>
+<ul>
+    Displays the export file dialog and allows the
+    user to save the figure displayed in the plotting panel to a file.
+    Supported graphical formats are: Encapsulated Postscript and PNG.
+    This functionality is also available via File->Export.
+</ul>
+</p>
+<p><a name="GUIUnfreeze"></a><img src="Unfreeze.bmp"><b>Unfreeze</b>
+<ul>
+    Unfreezes the processing of commands via the command
+    line. This command is intended for use in conjunction with the 
+    <a href="#Freeze">freeze</a> command. The freeze command is called at any
+    point in a script to suspend further processing of script commands and
+    allow the user to view/interact with the plot that has been created to
+    that point.  The Unfreeze button is invoked via the toolbar to resume
+    operation. This functionality is also available via File->Unfreeze.
+</ul>
+</p>
+<p><a name="GUIUndo"></a><img src="Undo.bmp"><b>Undo</b>
+<ul>
+    Undoes your last command.  If there are no commands to undo,
+    the Undo command in the Edit menu will be unavailable and clicking the
+    Undo toolbar button will result in no action. This functionality is
+    also available via Edit->Undo.
+</ul>
+</p>
+<p><a name="GUIRedo"></a><img src="Redo.bmp"><b>Redo</b>
+<ul>
+    Redoes your last command. If there are no commands to redo,
+    the Redo command in the Edit menu will be unavailable and clicking the
+    Redo toolbar button will result in no action. This functionality is
+    also available via Edit->Redo.
+</ul>
+</p>
+<p><a name="GUIUnzoom"></a><img src="Unzoom.bmp"><b>Unzoom</b>
+<ul>
+    Undoes a previously executed zoom. This functionality is also
+    available via View->Unzoom.
+</ul>
+</p>
+<p><a name="GUIRezoom"></a><img src="Zoom.bmp"><b>Rezoom</b>
+<ul>
+    Redoes a previously executed zoom. This functionality is also
+    available via View->Rezoom.
+</ul>
+</p>
+<p><a name="GUIInfo"></a><img src="InfoTool.bmp"><b>Info Tool</b>
+<ul>
+    Selecting the info tool allows the user to use the mouse pointer
+    to focus in/out among the available subplots.  Left-clicking the mouse
+    brings a subplot into focus (hiding the other subplots).  Right-clicking 
+    the mouse on the focused plot will show all subplots.  If there is only one
+    subplot, the info tool simply displays the mouse xy coordinates.
+    This functionality is also available via Tools->Info.
+</ul>
+</p>
+<p><a name="GUIZoom"></a><img src="ZoomTool.bmp"><b>Zoom Tool</b>
+<ul>
+    Selecting the zoom tool allows the user to use the mouse pointer
+    for zooming in on a particular area of the plot. Left-clicking the mouse
+    will zoom in.  Right-clicking the mouse will zoom out.
+    This functionality is also available via Tools->Zoom.
+</ul>
+</p>
+<p><a name="GUIPan"></a><img src="PanTool.bmp"><b>Pan Tool</b>
+<ul>
+    Selecting the pan tool allows the user to use the mouse pointer
+    to pan around the selected subplot.  Left-clicking the mouse and holding
+    the left button down will pan around the subplot.  Right-clicking restores
+    the original view.  This functionality is also available via Tools->Pan.
+</ul>
+</p>
+<p><a name="GUIUserManual"></a><img src="UserManual.bmp"><b>User Manual</b>
+<ul>
+    The User Manual button displays the DEAP User Manual.
+    This functionality is also available via Help->User Manual.
+</ul>
+</p>
+<hr>
+<h2><a name="Menus">Menus</a></h2>
+<p>
+The menu bar found at the top of the application and contains many of the same 
+commands as the toolbar with the addition of a few others.
+</p>
+<p>
+While the icons provide quick, single-click access to application functions,
+the menu bar includes a categorized listing of the functions under menu
+options File, Edit, View, Tools, and Help.
+</p>
+<p><a name="FileMenu"></a><h3>File Menu</h3>
+<ul>
+    <b>Open</b> 
+    <ul>
+        Displays the open file dialog and allows the
+        user to open a previously saved session or to import a user-created
+        file containing DEAP commands. This functionality is also available
+        in the toolbar.
+    </ul>
+    <p>
+    <b>Save</b>
+    <ul>
+        Displays the save file dialog if a file has not
+        been previously opened or saved and allows the user to save the current
+        session to a new .txt file.  If a file has been previously opened or
+        saved, that file is automatically overwritten with the current
+        command line history.
+        All commands typed into the command line are saved.  
+        This functionality is also available in the toolbar.
+    </ul>
+    <p>
+    <b>Save As</b> 
+    <ul>
+        Displays the save file dialog 
+        and allows the user to save the current session to a new .txt file. 
+        All commands typed into the command line are saved.  
+        This functionality is also available in the toolbar.
+    </ul>
+    <p>
+    <b>Page Setup</b>
+    <ul>
+        Displays the page setup dialog.  The page setup controls print settings.
+    </ul>
+    <p>
+    <b>Print Preview</b>
+    <ul>
+        Allows the user to see what the plot figure will look like when printed.
+    </ul>
+    <p>
+    <b>Print</b>
+    <ul>
+        Prints the plot figure.  This functionality is also available in the
+        toolbar.
+    </ul>
+    <p>
+    <b>Export</b>
+    <ul>
+        Displays the export file dialog and allows the
+        user to save the figure displayed in the plotting panel to a file.
+        Supported graphical formats are: Encapsulated Postscript and PNG.
+        This functionality is also available in the toolbar.
+    </ul>
+    <p>
+    <b>Unfreeze</b>
+    <ul>
+        Unfreezes the processing of commands via the command
+        line. This command is intended for use in conjunction with the 
+        <a href="#Freeze">freeze</a> command. The freeze command is called at 
+        any point in a script to suspend further processing of script commands
+        and allow the user to view/interact with the plot that has been created
+        to that point.  The Unfreeze button is invoked via the toolbar to resume
+        operation. This functionality is also available in the toolbar.
+    </ul>
+    <p>
+    <b>Exit</b>
+    <ul>
+        Exits the application.
+    </ul>
+</ul>
+</p>
+<p><a name="EditMenu"></a><h3>Edit Menu</h3>
+<ul>
+    <p>
+    <b> Undo</b>
+    <ul>
+        Undoes your last command.  If there are no commands to undo,
+        this option will be unavailable. This functionality is also available
+        in the toolbar.
+    </ul>
+    <p>
+    <b>Redo</b>
+    <ul>
+        Redoes your last command. If there are no commands to redo,
+        this option will be unavailable.  This functionality is also available
+        in the toolbar.
+    </ul>
+    <p>
+    <b>Clear</b>
+    <ul>
+        Clears the plot figure.  This is equivalent to calling clear() on
+        the plot figure instance.
+    </ul>
+</ul>
+</p>
+<p><a name="ViewMenu"></a><h3>View Menu</h3>
+<ul>
+    <p>
+    <b>Rezoom</b>
+    <ul>
+        Redoes a previously executed zoom. This functionality is also 
+        available in the toolbar.
+    </ul>
+    <p>
+    <b>Unzoom</b>
+    <ul>
+        Undoes a previously executed zoom. This functionality is also 
+        available in the toolbar.
+    </ul>
+    <p>
+    <b>Display All Subplots</b>
+    <ul>
+        Displays all subplots contained within a plot figure.  This is
+        equivalent to right-clicking on a focused subplot while using the
+        info tool.
+    </ul>
+    <p>
+    <b>Toolbar</b>
+    <ul>
+        Toggles the display of the toolbar.
+    </ul>
+    <p>
+    <b>Status Bar</b>
+    <ul>
+        Toggles the display of the status bar at the bottom of the application.
+    </ul>
+    <p>
+    <b>Full Screen</b>
+    <ul>
+        Expands the application window to fit the entire screen.  If already
+        expanded, shrinks the application window back to the original size.
+    </ul>
+</ul>
+</p>
+<p><a name="ToolsMenu"></a><h3>Tools Menu</h3>
+<ul>
+    <p>
+    <b>Info</b>
+    <ul>
+        Selecting the info tool allows the user to use the mouse pointer
+        to focus in/out among the available subplots.  Left-clicking the mouse
+        brings a subplot into focus (hiding the other subplots).  Right-clicking
+        the mouse on the focused plot will show all subplots.  If there is 
+        only one subplot, the info tool simply displays the mouse xy
+        coordinates.  This functionality can also be found in the toolbar.
+    </ul>
+    <p>
+    <b>Zoom</b>
+    <ul>
+        Selecting the zoom tool allows the user to use the mouse pointer
+        for zooming in on a particular area of the plot. Left-clicking the mouse
+        will zoom in.  Right-clicking the mouse will zoom out.  This 
+        functionality can also be found in the toolbar.
+    </ul>
+    <p>
+    <b>Pan</b>
+    <ul>
+        Selecting the pan tool allows the user to use the mouse pointer
+        to pan around the selected subplot.  Left-clicking the mouse and holding        the left button down will pan around the subplot.  Right-clicking
+        restores the original view.  This functionality can also be found in
+        the toolbar.
+    </ul>
+    <p>
+    <b>Options</b>
+    <ul>
+        Displays a dialog which allows the user to control various plotting
+        options.
+    </ul>
+</ul>
+</p>
+<p><a name="HelpMenu"></a><h3>Help Menu</h3>
+<ul>
+    <p>
+    <b>Self Test</b>
+    <ul>
+        Conducts a self test on the application.
+    </ul>
+    <p>
+    <b>User Manual</b>
+    <ul>
+        Displays this document.  
+        This functionality can also be found in the Help menu.
+    </ul>
+    <p>
+    <b>Tutorial</b>
+    <ul>
+        Displays the tutorial.
+    </ul>
+    <p>
+    <b>About</b>
+    <ul>
+        Displays version information and credits.
+    </ul>
+</ul>
+</p>
+</body>
+</html>

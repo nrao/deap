@@ -1,0 +1,112 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+    <link href="deap.css" rel="stylesheet" type="text/css" />
+    <title>
+      deap.sourceforge.net
+    </title>
+  </head>
+  <body>
+    <div class="header">
+      <a href="http://deap.sourceforge.net/">deap.sourceforge.net</a>
+    </div>
+    <div class="menu">
+		  <a href="http://sourceforge.net/projects/deap/">Project</a><br />
+			<a href="about.html">About</a><br />
+			<a href="faq.html">FAQ</a><br />
+			<a href="screenshots.html">Screen Shots</a><br />
+			<a href="help/index.html">Documentation</a><br />
+			<a href="http://sourceforge.net/project/showfiles.php?group_id=92078">Download</a><br />
+			<a href="install.html">Install</a><br />
+			<a href="http://wiki.gb.nrao.edu/bin/view/Software/DEAP">Wiki</a><br />
+			<a href="participants.html">Participants</a><br />
+			<a href="links.html">Links</a><br />
+    </div>
+    <div class="content">
+
+		  <p>
+        Astronomers from around the world come to the
+				<a href="http://www.gb.nrao.edu/">Green Bank</a>
+				site of the National Radio Astronomy Observatory
+				(<a href="http://www.nrao.edu/">NRAO</a>) to perform radio
+        astronomy observations with the Robert C. Byrd Green Bank Telescope
+				(<a href="http://www.gb.nrao.edu/GBT/">GBT</a>).
+				Thus, there is a pressing need for a generic data
+        display and analysis toolkit that will provide radio astronomers with a versatile mechanism for viewing and interpreting their
+        observation data. Astronomers refer to the conversion of raw radio astronomy data into publishable science as data reduction.
+        Data reduction is an interactive, highly iterative process of viewing the data in detail, editing it (data flagging), and
+        analyzing it (data fitting). Currently, there are no existing tools that accommodate data viewing, data flagging, and data
+        fitting within the same application. There are good tools for producing publication quality plots (PGPlot), for producing
+        interactive read-only plots (tkplot or qwt), and for doing data analysis (numeric, gsl). However, no existing free tools solidly
+        combine all these features, and no existing tools provide quality interactive graphical data editing. The creation of a single
+        application that marries these needs is the motivation for Data Extraction and Analysis Program, or DEAP. Even though DEAP has
+        been developed with the data reduction needs of the NRAO in mind, all assumptions regarding the nature of the data entered into
+        the program were kept at a minimum. This means that DEAP is intended to be useful for viewing, flagging, and fitting many types
+        of data, not just astronomical data. Hence, DEAP will be made available as an Open Source product via Source Forge at
+        <a href="http://deap.sourceforge.net/">http://deap.sourceforge.net/</a>.
+		  </p>
+
+		  <p>
+        DEAP is written in Python and presents two user interfaces - a command line window and a plot window. The GUI portion of DEAP
+        utilizes wxPython and features a custom widget, created by the NRAO, that integrates PGPlot into wxWindows. PGPlot is a
+        C-callable, device-independent graphics package for making simple scientific graphs and has been used in radio astronomy software
+        for many years to produce publication-quality plots (see
+				<a href="http://www.astro.caltech.edu/~tjp/pgplot/">http://www.astro.caltech.edu/~tjp/pgplot/</a>
+				for more information regarding PGPlot). The following is a summary of DEAP’s current features:
+		  </p>
+			
+			<ul>
+        <li>Interactive, multicolor XY plotting with zooming, error bars, and data flagging capabilities</li>
+        <li>XY plots allow choice of line type (including no line), choice of marker type for data point representation and auto-scaling</li>
+        <li>Creation of titles, axes labels, and annotations</li>
+        <li>Plotting of multiple data sets on the same plot</li>
+        <li>Saving/Retrieving of plots and plot information from binary files</li>
+        <li>Exporting of plots to a variety of graphical formats: BMP, GIF, Postscript, color Postscript</li>
+        <li>Data analysis operations available for data sets include calculation of the mean, calculation of the variance, Gaussian fitting, linear fitting, and polynomial fitting</li>
+        <li>Command line (allowing full access to numeric python)</li>
+        <li>User interactive plot window</li>
+			</ul>
+
+		  <p>
+        Perhaps DEAP's features can be better explained by highlighting some of the features above. XY data sets are entered into DEAP
+        via the command line window. The X data and Y data are simply lists of numbers. In fact, all data entered into DEAP and extracted
+        from DEAP are formatted as lists at the command line. The command line window for DEAP is the Python command line plus a set of
+        functions through which the user may interact with DEAP. For example, the user may add a new XY plot to DEAP via the AddXYPlot
+        command that accepts two arguments - a list of x data and a list of y data. The command line enables DEAP commands to be executed
+        one at a time or as scripts (via Python's execfile function). Many commands that are available via the command line are also
+        available via drop-down menus or toolbar items in the plot window. One feature of note is the integration of both the command
+        line window and the plot window, meaning that command issued through one window are reflected both in DEAP and in the other
+        window.
+		  </p>
+
+		  <p>
+        The plot window is focused on handling user interactions with the XY data sets. These interactions include zooming and flagging.
+        Flagging refers to associating an integer value with a data point. By default, all data points in an XY data set are flagged with
+        a value of 0. The user associates flag values with data points by lassoing them with the mouse. Because the flag values are
+        simply integers, the user is free to associate any meaning to the flag values that he/she desires. Flagging is important in
+        working with radio astronomy data because it is an important means of highlighting data contaminated with radio frequency
+        interference or RFI.
+		  </p>
+
+		  <p>
+        DEAP currently runs on Linux and Windows, but plans are underway to allow its use on Mac Os X.
+		  </p>
+			
+			<p align="right">
+			  <a href="http://sourceforge.net/">
+				  <img src="http://sourceforge.net/sflogo.php?group_id=92078&type=1" border="0">
+				</a>
+			</p>
+
+    </div>
+    <div class="footer">
+      <hr />
+      Last modified: Feb 17, 2004<br />
+      <address>
+        <a href="mailto:eric@sonic-weasel.org">Eric Sessoms &lt;eric@sonic-weasel.org&gt;</a>
+      </address>
+    </div>
+  </body>
+</html>
+

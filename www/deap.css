@@ -1,0 +1,103 @@
+BODY
+{
+  background-color: white;
+  color:            black
+}
+
+H1
+{
+  text-align:     center;
+  text-transform: none;
+  font-size:      large;
+  font-style:     normal;
+  font-weight:    bold
+}
+
+H2
+{
+  text-align:     left;
+  text-transform: lowercase;
+  font-size:      medium;
+  font-style:     italic;
+  font-weight:    600
+}
+
+P EM
+{
+  font-style:  normal;
+  font-weight: bold
+}
+
+A
+{
+  text-decoration: none
+}
+
+A:HOVER
+{
+  background-color: #dcdcdc
+}
+
+DIV.quote
+{
+  width:      100%;
+  text-align: right;
+  font-size:  smaller
+}
+
+UL
+{
+  list-style: square
+}
+
+UL DIV
+{
+  width: 500
+}
+
+DIV.header
+{
+	margin: 10px 0px 10px 0px;
+	padding: 10px 0px 0px 10px;
+	height: 14px;
+	border-style: solid;
+	border-color: black;
+	border-width: 1px;
+	line-height: 11px;
+	background-color: #dcdcdc;
+}
+
+DIV.menu
+{
+  float: left;
+	top: 80px;
+	left: 20px;
+	width: 150px;
+	padding: 10px;
+	background-color: #dcdcdc;
+	border-width: 1px;
+	border-color: black;
+	border-style: solid;
+	line-height: 17px;
+}
+
+DIV.content
+{
+  float: right;
+	margin-left: 50px;
+	margin-right: 50px;
+	padding:10px;
+}
+
+DIV.footer
+{
+  clear: both;
+  text-align: left;
+  font-size:  smaller
+}
+
+SPAN.header
+{
+  font-style: italic;
+	font-weight: bold
+}

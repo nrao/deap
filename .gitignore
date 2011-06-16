@@ -1,0 +1,5 @@
+*.pyc
+*~
+
+#Ignore old CVS folders
+*CVS*
