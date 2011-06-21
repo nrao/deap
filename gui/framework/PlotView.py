@@ -100,6 +100,13 @@ class MyAxesLimits(AxesLimits):
         """
         return not (not self._get_redo_history(axes))
 
+    def can_unzoom(self, axes):
+        """
+        Returns a boolean indicating if there are unzooming actions that can be
+        redone.
+        """
+        return len(self._get_history(axes)) > 0
+
     def redo(self, axes):
         """
         Rezooms the axes.
@@ -125,6 +132,7 @@ class MyAxesLimits(AxesLimits):
         if self.zoomed(axes):
             self._get_redo_history(axes).append((axes.get_xlim()
                                                , axes.get_ylim()))
+
         return AxesLimits.restore(self, axes)
 
 class PanTool:
@@ -197,6 +205,39 @@ class PanTool:
 
         FigureCanvasWxAgg.draw(self.getView())
 
+    def panAll(self, x, y, axesList):
+        """
+        Pans across multiple subplots simultaneously.  Use this
+        function rather than pan to avoid lag on the x-axis.
+        """
+        if not self.enabled:    return
+
+        i=0
+        movex, movey = 0, 0
+        xmin, xmax = 0, 0
+        for axes in axesList:
+            if not is_log_x(axes):
+                xtick = axes.get_xaxis()._get_tick(major=False)._size
+                movex = (self.getX() - x) / xtick / 10
+                # TBF: matplotlib's Axes' panx method is broken, so we do it here
+                axes.xaxis.pan(movex)
+                if i==0:    # we want to keep all plots on a common x-axis
+                    xmin, xmax = axes.viewLim.intervalx().get_bounds()
+                axes.set_xlim(xmin, xmax)
+                axes._send_xlim_event()
+            if not is_log_y(axes):
+                ytick = axes.get_yaxis()._get_tick(major=False)._size
+                movey = (self.getY() - y) / ytick / 10
+                axes.pany(movey)
+            i += 1
+
+        self.panx += movex
+        self.pany += movey
+        self.setX(x)
+        self.setY(y)
+
+        FigureCanvasWxAgg.draw(self.getView())
+
     def end_pan(self, x, y, axes):
         """
         Returns the axes limits to their original settings before panning
@@ -204,15 +245,47 @@ class PanTool:
         """
         if not self.enabled: return
 
+        panx = self.panx
+        pany = self.pany
         if not is_log_x(axes):
             # TBF: matplotlib's Axes' panx method is broken, so we do it
             #      here for them.
             axes.xaxis.pan(-self.panx)
             axes._send_xlim_event()
             self.panx = 0
-        if not is_log_y(axes):    
+        if not is_log_y(axes):
             axes.pany(-self.pany)
             self.pany = 0
+
+        FigureCanvasWxAgg.draw(self.getView())
+
+    def end_pan_all(self, x, y, axesList):
+        """
+        End panning for multiple subplots.  Use this function
+        to correctly reset limits for all axes.
+        """
+
+        if not self.enabled: return
+        i = 0
+        xmin, xmax = 0, 0
+        for axes in axesList:
+            if not is_log_x(axes):
+                # TBF: matplotlib's Axes' panx method is broken, so we do it
+                #      here for them.
+                axes.xaxis.pan(-self.panx)
+                if i==0:    # we want to keep all plots on a common x-axis
+                    xmin, xmax = axes.viewLim.intervalx().get_bounds()
+                axes.set_xlim(xmin, xmax)
+                axes._send_xlim_event()
+
+            if not is_log_y(axes):
+                axes.pany(-self.pany)
+                axes._send_ylim_event()
+
+            i += 1
+
+        self.panx = 0
+        self.pany = 0
 
         FigureCanvasWxAgg.draw(self.getView())
 
@@ -228,6 +301,7 @@ class MyPlotPanelDirector(PlotPanelDirector):
         self.infoMode       = not zoom
         self.zoomMode       = zoom
         self.panMode        = False
+        self.gridMode       = False
         self.activeSubplot  = None
         self.selectedAxes   = None
         self.panTool        = PanTool(view, False)
@@ -252,7 +326,7 @@ class MyPlotPanelDirector(PlotPanelDirector):
         view = self.getView()
 
         if self.selectedAxes is None:
-            axes, xdata, ydata = wxmpl.find_axes(view, x, y)
+            axes, xdata, ydata = self.find_axes(view, x, y)
         else:
             axes = self.selectedAxes
             xdata, ydata = get_data(axes, x, y)
@@ -266,6 +340,33 @@ class MyPlotPanelDirector(PlotPanelDirector):
             view.cursor.setCross()
             view.crosshairs.clear()
 
+    def find_axes(self, canvas, x, y):
+        """
+        Override the wxmpl.find_axes function
+        """
+        #return wxmpl.find_axes(canvas, x, y)
+        axes = None
+        for a in canvas.get_figure().get_axes():
+            if a.in_axes(x, y):
+                if axes is None:
+                    axes = a
+        if axes is None:
+            return None, None, None
+        xdata, ydata = axes.transData.inverse_xy_tup((x, y))
+        return axes, xdata, ydata
+
+    def find_all_axes(self, canvas, x=None, y=None):
+        """
+        Return a list of all axes in canvas
+        """
+        axeslist = []
+        for a in canvas.get_figure().get_axes():
+            if x is None and y is None:
+                axeslist.append(a)
+            elif a.in_axes(x, y):
+                axeslist.append(a)
+        return axeslist
+
     def leftButtonUp(self, evt, x, y):
         """
         Completely overrides base class functionality.
@@ -276,7 +377,7 @@ class MyPlotPanelDirector(PlotPanelDirector):
         view = self.getView()
 
         if self.selectedAxes is None:
-            axes, xdata, ydata = wxmpl.find_axes(view, x, y)
+            axes, xdata, ydata = self.find_axes(view, x, y)
         else:
             axes = self.selectedAxes
             xdata, ydata = get_data(axes, x, y)
@@ -306,8 +407,11 @@ class MyPlotPanelDirector(PlotPanelDirector):
         if axes is not None:
             xdata, ydata = axes.transData.inverse_xy_tup((x, y))
             if self.zoomEnabled:
-                if self.limits.set(axes, xrange, yrange):
-                    FigureCanvasWxAgg.draw(view)
+                for ax in self.find_all_axes(view, x, y):
+                    #selected axis?
+                    xrange, yrange = get_selected_data(ax, x0, y0, x, y)
+                    if self.limits.set(ax, xrange, yrange):
+                        FigureCanvasWxAgg.draw(view)
             else:
                 self.getView().notify_selection(axes, x0, y0, x, y)
 
@@ -319,6 +423,9 @@ class MyPlotPanelDirector(PlotPanelDirector):
         else:
             view.crosshairs.set(x, y)
             view.location.set(wxmpl.format_coord(axes, xdata, ydata))
+
+        if len(self.find_all_axes(self.view, x, y)) > 1:
+            self.UpdateLocationStr(x, y)
 
     def SelectAxes(self, axes):
         """
@@ -339,15 +446,23 @@ class MyPlotPanelDirector(PlotPanelDirector):
         view = self.getView()
 
         if self.selectedAxes is None:
-            axes, xdata, ydata = wxmpl.find_axes(view, x, y)
+            axes, xdata, ydata = self.find_axes(view, x, y)
         else:
             axes = self.selectedAxes
             xdata, ydata = get_data(axes, x, y)
 
         self.setActiveSubplot(axes)
 
-        if (axes is not None and self.zoomEnabled and self.rightClickUnzoom
-        and self.limits.restore(axes)):
+        if self.zoomEnabled and self.rightClickUnzoom:
+            xmin = xmax = None
+            for axes in self.find_all_axes(view, x, y): # unzoom all axes
+                self.limits.restore(axes)
+                if not self.limits.can_unzoom(axes):
+                    # rescale manually - wxmpl will try to autoscale
+                    if xmin is None or xmax is None: # make sure x-axis matches
+                        xmin, xmax = axes.viewLim.intervalx().get_bounds()
+                    axes.set_xlim(xmin, xmax)
+                    axes._send_xlim_event()
             view.crosshairs.clear()
             view.draw()
             view.crosshairs.set(x, y)
@@ -357,7 +472,22 @@ class MyPlotPanelDirector(PlotPanelDirector):
             FigureCanvasWxAgg.draw(view)
 
         if self.IsPanMode() and axes is not None:
-            self.panTool.end_pan(x, y, axes)
+            self.panTool.end_pan_all(x, y, self.find_all_axes(view, x, y))
+
+    def UpdateLocationStr(self, x, y):
+        """
+        Update coordinate location for all axes
+        """
+        axes = self.find_all_axes(self.view, x, y)
+        coordstr = ""
+        i = 0
+        for ax in axes:
+            i += 1
+            xdata, ydata = get_data(ax, x, y)
+            xi = ax.format_xdata(xdata)
+            yi = ax.format_ydata(ydata)
+            coordstr += "\nx%s=%s,\ty%s=%s"%(i, xi, i, yi)
+        self.view.location.set(coordstr[1:])
 
     def mouseMotion(self, evt, x, y):
         """
@@ -366,7 +496,7 @@ class MyPlotPanelDirector(PlotPanelDirector):
         view = self.getView()
 
         if self.selectedAxes is None:
-            axes, xdata, ydata = wxmpl.find_axes(view, x, y)
+            axes, xdata, ydata = self.find_axes(view, x, y)
         else:
             axes = self.selectedAxes
             xdata, ydata = get_data(axes, x, y)
@@ -381,10 +511,14 @@ class MyPlotPanelDirector(PlotPanelDirector):
             else:
                 self.axesMouseMotion(evt, x, y, axes, xdata, ydata)
 
-        if self.IsPanMode() and \
-           self.leftButtonPoint and \
-           self.getActiveSubplot() is not None:
-               self.panTool.pan(x, y, self.getActiveSubplot())
+        if self.IsPanMode() and self.leftButtonPoint:
+            if len(self.find_all_axes(view, x, y)) > 1:
+                self.panTool.panAll(x, y, self.find_all_axes(view, x, y))
+            elif self.getActiveSubplot() is not None:
+                self.panTool.pan(x, y, self.getActiveSubplot())
+
+        if len(self.find_all_axes(self.view, x, y)) > 1:
+            self.UpdateLocationStr(x, y)
 
     def AreSubplotsHidden(self):
         """
@@ -460,6 +594,28 @@ class MyPlotPanelDirector(PlotPanelDirector):
         self.zoomMode = False
         self.panMode  = True
 
+    def SetGridMode(self, setting=None):
+        """
+        Turns the grid on or off, or toggles if no setting is given.
+        """
+        if setting:
+            self.gridMode = setting
+        else:
+            self.gridMode = not self.gridMode
+
+        axes = self.getView().GetAxes()
+        for subplot in axes:
+            if self.gridMode:
+                subplot.yaxis.grid(True)
+                subplot.xaxis.grid(True)
+            else:
+                subplot.yaxis.grid(False)
+                subplot.xaxis.grid(False)
+        if len(axes) == 2:
+            for line in axes[1].yaxis.get_gridlines():
+                line.set_color('gray')
+        self.getView().draw()
+
     def IsInfoMode(self):
         """
         Returns a boolean indicating if the info tool is selected.
@@ -478,13 +634,22 @@ class MyPlotPanelDirector(PlotPanelDirector):
         """
         return self.panMode
 
+    def IsGridMode(self):
+        """
+        Returns a boolean indicating if the grid is on.
+        """
+        return self.gridMode
+
     def ZoomIn(self):
         """
         Window to rezoom functionality.
         """
         if self.getActiveSubplot() is not None:
             self.limits.redo(self.getActiveSubplot())
-            self.getView().draw()
+        elif len(self.find_all_axes(self.getView())) > 1:
+            for ax in self.find_all_axes(self.getView()):
+                self.limits.redo(ax)
+        self.getView().draw()
 
     def ZoomOut(self):
         """
@@ -492,7 +657,10 @@ class MyPlotPanelDirector(PlotPanelDirector):
         """
         if self.getActiveSubplot() is not None:
             self.limits.restore(self.getActiveSubplot())
-            self.getView().draw()
+        elif len(self.find_all_axes(self.getView())) > 1:
+            for ax in self.find_all_axes(self.getView()):
+                self.limits.restore(ax)
+        self.getView().draw()
 
 class PlotView(PlotPanel):
     """
@@ -545,6 +713,12 @@ class PlotView(PlotPanel):
         """
         return self.director.IsPanMode()
 
+    def IsGridMode(self):
+        """
+        Returns a boolean indicating if the grid is on.
+        """
+        return self.director.IsGridMode()
+
     def SetInfoMode(self):
         """
         Enables the info tool.
@@ -562,6 +736,12 @@ class PlotView(PlotPanel):
         Enables the pan tool.
         """
         self.director.SetPanMode()
+
+    def SetGridMode(self):
+        """
+        Toggles the grid.
+        """
+        self.director.SetGridMode()
 
     def GetAxes(self):
         """
@@ -594,14 +774,20 @@ class PlotView(PlotPanel):
         """
         Shows the user a print preview of the canvas.
         """
-        self.GetPrinter().previewFigure(self.get_figure(), "Plot")
+        self.printer.destroy()
+        self.InitPrinter()
+        printer = self.GetPrinter()
+        fig = self.get_figure()
+        printer.previewFigure(fig, "Plot")
         self.draw()
 
     def Print(self):
         """
         Prints the canvas.
         """
-        self.GetPrinter().printFigure(self.get_figure(), "Plot")
+        printer = self.GetPrinter()
+        fig = self.get_figure()
+        printer.printFigure(fig, "Plot")
         self.draw()
 
     def PageSetup(self):

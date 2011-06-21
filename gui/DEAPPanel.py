@@ -35,7 +35,8 @@ import wx
   , ID_TOOLBAR_INFOTOOL
   , ID_TOOLBAR_ZOOMTOOL
   , ID_TOOLBAR_PANTOOL
-] = map(lambda _init_coll_tool_bar_Tools: wx.NewId(), range(11))
+  , ID_TOOLBAR_GRIDTOOL
+] = map(lambda _init_coll_tool_bar_Tools: wx.NewId(), range(12))
 
 [
     ID_FILE_EXPORT
@@ -46,7 +47,8 @@ import wx
     ID_TOOLS_INFO
   , ID_TOOLS_ZOOM
   , ID_TOOLS_PAN
-] = [wx.NewId() for i in range(3)]
+  , ID_TOOLS_GRID
+] = [wx.NewId() for i in range(4)]
 
 [
     ID_VIEW_ZOOM
@@ -132,11 +134,13 @@ class DEAPPanel(Panel):
         toolsMnu.InsertCheckItem(0, ID_TOOLS_INFO, '&Info')
         toolsMnu.InsertCheckItem(1, ID_TOOLS_ZOOM, '&Zoom')
         toolsMnu.InsertCheckItem(2, ID_TOOLS_PAN,  '&Pan')
-        toolsMnu.InsertSeparator(3)
+        toolsMnu.InsertCheckItem(3, ID_TOOLS_GRID, '&Grid')
+        toolsMnu.InsertSeparator(4)
 
         wx.EVT_MENU(self.GetFrame(), ID_TOOLS_INFO, self.OnToolsInfo)
         wx.EVT_MENU(self.GetFrame(), ID_TOOLS_ZOOM, self.OnToolsZoom)
         wx.EVT_MENU(self.GetFrame(), ID_TOOLS_PAN,  self.OnToolsPan)
+        wx.EVT_MENU(self.GetFrame(), ID_TOOLS_GRID, self.OnToolsGrid)
 
         wx.EVT_MENU(self.GetFrame(), ID_TOOLS_OPTIONS, self.OnOptions)
 
@@ -193,6 +197,10 @@ class DEAPPanel(Panel):
                   id=ID_TOOLBAR_PANTOOL, isToggle=True,
                   longHelpString='', pushedBitmap=wx.Bitmap(self.GetImagePath('PanTool.bmp')),
                   shortHelpString='Pan Tool')
+        toolBar.AddTool(bitmap=wx.Bitmap(self.GetImagePath('Grid.bmp')),
+                id=ID_TOOLBAR_GRIDTOOL, isToggle=False,
+                longHelpString='', pushedBitmap=wx.Bitmap(self.GetImagePath('Grid.bmp')),
+                shortHelpString='Grid Tool')
         toolBar.AddTool(bitmap=wx.Bitmap(self.GetImagePath('UserManual.bmp')),
               id=ID_TOOLBAR_USERMANUAL, isToggle=False,
               longHelpString='', pushedBitmap=wx.Bitmap(self.GetImagePath('UserManual.bmp')),
@@ -210,6 +218,7 @@ class DEAPPanel(Panel):
         wx.EVT_TOOL(self.GetFrame(), ID_TOOLBAR_INFOTOOL,  self.OnToolsInfo)
         wx.EVT_TOOL(self.GetFrame(), ID_TOOLBAR_ZOOMTOOL,  self.OnToolsZoom)
         wx.EVT_TOOL(self.GetFrame(), ID_TOOLBAR_PANTOOL,   self.OnToolsPan)
+        wx.EVT_TOOL(self.GetFrame(), ID_TOOLBAR_GRIDTOOL,  self.OnToolsGrid)
         wx.EVT_TOOL(self.GetFrame(), ID_TOOLBAR_USERMANUAL, self.OnUserManual)
 
         toolBar.Realize()
@@ -267,6 +276,7 @@ class DEAPPanel(Panel):
         self.GetMenuBar().Check(ID_TOOLS_INFO, self.GetPlotView().IsInfoMode())
         self.GetMenuBar().Check(ID_TOOLS_ZOOM, self.GetPlotView().IsZoomMode())
         self.GetMenuBar().Check(ID_TOOLS_PAN,  self.GetPlotView().IsPanMode())
+        self.GetMenuBar().Check(ID_TOOLS_GRID, self.GetPlotView().IsGridMode())
 
         self.GetMenuBar().Enable(ID_TOOLS_OPTIONS, 1)
 
@@ -443,18 +453,23 @@ class DEAPPanel(Panel):
         self.GetPlotView().SetInfoMode()
 
     def OnToolsZoom(self, event):
-        "Handler for an zoom tool selection event."
+        "Handler for a zoom tool selection event."
         self.GetToolBar().ToggleTool(ID_TOOLBAR_INFOTOOL, False)
         self.GetToolBar().ToggleTool(ID_TOOLBAR_ZOOMTOOL, True)
         self.GetToolBar().ToggleTool(ID_TOOLBAR_PANTOOL,  False)
         self.GetPlotView().SetZoomMode()
 
     def OnToolsPan(self, event):
-        "Handler for an pan tool selection event."
+        "Handler for a pan tool selection event."
         self.GetToolBar().ToggleTool(ID_TOOLBAR_INFOTOOL, False)
         self.GetToolBar().ToggleTool(ID_TOOLBAR_ZOOMTOOL, False)
         self.GetToolBar().ToggleTool(ID_TOOLBAR_PANTOOL,  True)
         self.GetPlotView().SetPanMode()
+
+    def OnToolsGrid(self, event):
+        "Handler for a grid tool selection event."
+        self.GetToolBar().ToggleTool(ID_TOOLBAR_GRIDTOOL, True)
+        self.GetPlotView().SetGridMode()
 
     def OnUserManual(self, event):
         "Handler for a user help event."

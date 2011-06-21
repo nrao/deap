@@ -31,6 +31,7 @@ FUNCTIONS = [
   , "open_file"   # should just be execfile
   , "redo"
   , "undo"
+  , "get_data"
 ]
 
 class Interpreter:
@@ -189,3 +190,22 @@ class Interpreter:
     def undo(self):
         "Undoes the last command typed in the interactive shell."
         self.GetDocument().Undo()
+
+    def get_data(self, index=None):
+        """
+        Returns either data for the indicated subplot or a list of all 
+        data plotted on the graph.  Subplots are ordered starting with 
+        Y1 columns and continuing with Y2 columns.
+        
+        Data for each subplot is returned in a list like:
+        [[x1, x2, ..., xN], [y2, y2, ..., yN]]
+        """
+        j = 0
+        data = []
+        for axes in self.get_subplot():
+            for line in axes.lines:
+                data.append([line.get_xdata(), line.get_ydata()])
+                j +=1
+        if index:
+            return data[j]
+        return data

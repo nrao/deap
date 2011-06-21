@@ -28,6 +28,8 @@ ID_HELP_MENU   = -1
 [
     ID_FILE_OPEN
   , ID_FILE_CLOSE
+  , ID_FILE_IMPORTTXT
+  , ID_FILE_EXPORTTXT
   , ID_FILE_SAVE
   , ID_FILE_SAVE_AS
   , ID_FILE_SAVE_ALL
@@ -35,7 +37,7 @@ ID_HELP_MENU   = -1
   , ID_FILE_PAGESETUP
   , ID_FILE_PPREVIEW
   , ID_FILE_EXIT
-] = [wx.NewId() for i in range(9)]
+] = [wx.NewId() for i in range(11)]
 
 [
     ID_EDIT_UNDO
@@ -95,7 +97,6 @@ class Frame(wx.Frame):
             
         # Give the new panel a chance to make any necessary customizations.
         self.SetPanel(panel)
-
         if self.GetPanel() is not None:
             self.GetPanel().ActivateSite(self)
             
@@ -182,6 +183,9 @@ class Frame(wx.Frame):
         fileMnu.Append(ID_FILE_OPEN, "&Open...\tCtrl+O", "Open a file.")
         fileMnu.Append(ID_FILE_CLOSE, "&Close\tCtrl+W", "Close the current window.")
         fileMnu.AppendSeparator()
+        fileMnu.Append(ID_FILE_IMPORTTXT, "&Import text...", "Import data in a text file.")
+        fileMnu.Append(ID_FILE_EXPORTTXT, "&Export text...", "Export data in a text file.")
+        fileMnu.AppendSeparator()
         fileMnu.Append(ID_FILE_SAVE, "&Save\tCtrl+S", "Save the current window.")
         fileMnu.Append(ID_FILE_SAVE_AS, "Save As...", "Save the current window to a new file.")
         fileMnu.Append(ID_FILE_SAVE_ALL, "Save &All", "Save all open windows.")
@@ -246,7 +250,7 @@ class Frame(wx.Frame):
             self.GetPanel().UpdateMenus()
 
     def UpdateFileMenu(self):
-        for id in (ID_FILE_OPEN, ID_FILE_CLOSE, ID_FILE_SAVE, ID_FILE_SAVE_AS, ID_FILE_SAVE_ALL, ID_FILE_PRINT, ID_FILE_PPREVIEW, ID_FILE_PAGESETUP):
+        for id in (ID_FILE_OPEN, ID_FILE_CLOSE, ID_FILE_IMPORTTXT, ID_FILE_EXPORTTXT, ID_FILE_SAVE, ID_FILE_SAVE_AS, ID_FILE_SAVE_ALL, ID_FILE_PRINT, ID_FILE_PPREVIEW, ID_FILE_PAGESETUP):
             self.GetMenuBar().Enable(id, 0)
         self.GetMenuBar().Enable(ID_FILE_EXIT, 1)
 
