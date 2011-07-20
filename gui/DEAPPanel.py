@@ -19,6 +19,7 @@ from   framework        import *
 from   OptionsDialog    import OptionsDialog
 from   TutorialFrame    import TutorialFrame
 from   UserManualFrame  import UserManualFrame
+from   PlotEditFrame    import PlotEditFrame
 import os
 import sys
 import wx
@@ -36,7 +37,8 @@ import wx
   , ID_TOOLBAR_ZOOMTOOL
   , ID_TOOLBAR_PANTOOL
   , ID_TOOLBAR_GRIDTOOL
-] = map(lambda _init_coll_tool_bar_Tools: wx.NewId(), range(12))
+  , ID_TOOLBAR_EDITTOOL
+] = map(lambda _init_coll_tool_bar_Tools: wx.NewId(), range(13))
 
 [
     ID_FILE_EXPORT
@@ -142,6 +144,7 @@ class DEAPPanel(Panel):
         wx.EVT_MENU(self.GetFrame(), ID_TOOLS_PAN,  self.OnToolsPan)
         wx.EVT_MENU(self.GetFrame(), ID_TOOLS_GRID, self.OnToolsGrid)
 
+        wx.EVT_MENU(self.GetFrame(), ID_TOOLS_PLOTEDIT, self.OnToolsEdit)
         wx.EVT_MENU(self.GetFrame(), ID_TOOLS_OPTIONS, self.OnOptions)
 
     def ActivateHelpMenu(self):
@@ -201,6 +204,10 @@ class DEAPPanel(Panel):
                 id=ID_TOOLBAR_GRIDTOOL, isToggle=False,
                 longHelpString='', pushedBitmap=wx.Bitmap(self.GetImagePath('Grid.bmp')),
                 shortHelpString='Grid Tool')
+        toolBar.AddTool(bitmap=wx.Bitmap(self.GetImagePath('PlotEdit.bmp')),
+                id=ID_TOOLBAR_EDITTOOL, isToggle=False,
+                longHelpString='', pushedBitmap=wx.Bitmap(self.GetImagePath('PlotEdit.bmp')),
+                shortHelpString='Plot Edit Tool')
         toolBar.AddTool(bitmap=wx.Bitmap(self.GetImagePath('UserManual.bmp')),
               id=ID_TOOLBAR_USERMANUAL, isToggle=False,
               longHelpString='', pushedBitmap=wx.Bitmap(self.GetImagePath('UserManual.bmp')),
@@ -219,6 +226,7 @@ class DEAPPanel(Panel):
         wx.EVT_TOOL(self.GetFrame(), ID_TOOLBAR_ZOOMTOOL,  self.OnToolsZoom)
         wx.EVT_TOOL(self.GetFrame(), ID_TOOLBAR_PANTOOL,   self.OnToolsPan)
         wx.EVT_TOOL(self.GetFrame(), ID_TOOLBAR_GRIDTOOL,  self.OnToolsGrid)
+        wx.EVT_TOOL(self.GetFrame(), ID_TOOLBAR_EDITTOOL,  self.OnToolsEdit)
         wx.EVT_TOOL(self.GetFrame(), ID_TOOLBAR_USERMANUAL, self.OnUserManual)
 
         toolBar.Realize()
@@ -470,6 +478,11 @@ class DEAPPanel(Panel):
         "Handler for a grid tool selection event."
         self.GetToolBar().ToggleTool(ID_TOOLBAR_GRIDTOOL, True)
         self.GetPlotView().SetGridMode()
+
+    def OnToolsEdit(self, event):
+        "Handler for a plot edit tool selection event."
+        frame = PlotEditFrame(self, self.GetPlotView())
+        frame.Show()
 
     def OnUserManual(self, event):
         "Handler for a user help event."

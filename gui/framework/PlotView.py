@@ -19,6 +19,7 @@ from   wxmpl   import AxesLimits
 from   wxmpl   import PlotPanel
 from   wxmpl   import PlotPanelDirector
 from   wxmpl   import FigurePrinter
+from   wxmpl   import FigurePrintout
 from   wxmpl   import LocationPainter
 from   wxmpl   import LINUX_PRINTING_COMMAND
 import weakref
@@ -408,10 +409,10 @@ class MyPlotPanelDirector(PlotPanelDirector):
             xdata, ydata = axes.transData.inverse_xy_tup((x, y))
             if self.zoomEnabled:
                 for ax in self.find_all_axes(view, x, y):
-                    #selected axis?
                     xrange, yrange = get_selected_data(ax, x0, y0, x, y)
-                    if self.limits.set(ax, xrange, yrange):
-                        FigureCanvasWxAgg.draw(view)
+                    if xrange is not None and yrange is not None:
+                        if self.limits.set(ax, xrange, yrange):
+                            FigureCanvasWxAgg.draw(view)
             else:
                 self.getView().notify_selection(axes, x0, y0, x, y)
 
@@ -644,22 +645,22 @@ class MyPlotPanelDirector(PlotPanelDirector):
         """
         Window to rezoom functionality.
         """
-        if self.getActiveSubplot() is not None:
-            self.limits.redo(self.getActiveSubplot())
-        elif len(self.find_all_axes(self.getView())) > 1:
+        if len(self.find_all_axes(self.getView())) > 1:
             for ax in self.find_all_axes(self.getView()):
                 self.limits.redo(ax)
+        elif self.getActiveSubplot() is not None:
+            self.limits.redo(self.getActiveSubplot())
         self.getView().draw()
 
     def ZoomOut(self):
         """
         Window to unzoom functionality.
         """
-        if self.getActiveSubplot() is not None:
-            self.limits.restore(self.getActiveSubplot())
-        elif len(self.find_all_axes(self.getView())) > 1:
+        if len(self.find_all_axes(self.getView())) > 1:
             for ax in self.find_all_axes(self.getView()):
                 self.limits.restore(ax)
+        elif self.getActiveSubplot() is not None:
+            self.limits.restore(self.getActiveSubplot())
         self.getView().draw()
 
 class PlotView(PlotPanel):
@@ -774,12 +775,32 @@ class PlotView(PlotPanel):
         """
         Shows the user a print preview of the canvas.
         """
-        self.printer.destroy()
-        self.InitPrinter()
         printer = self.GetPrinter()
         fig = self.get_figure()
-        printer.previewFigure(fig, "Plot")
+        #printer.previewFigure(fig, "Plot")
+        self.previewFigure(fig, "Plot")
         self.draw()
+    
+    def previewFigure(self, figure, title=None):
+        """
+        Replace wxmpl.FigurePrinter.previewFigure method - fails in
+        version 1.2.9 because FigurePrintout is missing method HasPage
+        """
+        window = self.printer.view
+        while not isinstance(window, wx.Frame):
+            window = window.GetParent()
+            assert window is not None
+
+        fpo = MyFigurePrintout(figure, title)
+        fpo4p = MyFigurePrintout(figure, title)
+        preview = wx.PrintPreview(fpo, fpo4p, self.printer.pData)
+        frame = wx.PreviewFrame(preview, window, 'Print Preview')
+        if self.printer.pData.GetOrientation() == wx.PORTRAIT:
+            frame.SetSize(wx.Size(450, 625))
+        else:
+            frame.SetSize(wx.Size(600, 500))
+        frame.Initialize()
+        frame.Show(True)
 
     def Print(self):
         """
@@ -787,8 +808,27 @@ class PlotView(PlotPanel):
         """
         printer = self.GetPrinter()
         fig = self.get_figure()
-        printer.printFigure(fig, "Plot")
+
+        # this makes a copy of the wx.PrintData instead of just saving
+        # a reference to the one inside the PrintDialogData that will
+        # be destroyed when the dialog is destroyed (causing segfaults)
+        printData = wx.PrintData(printer.getPrintData())
+        #printer.printFigure(fig, "Plot")
+        self.printFigure(fig, "Plot")
+        self.printer.setPrintData(printData) # reset print data
         self.draw()
+
+    def printFigure(self, figure, title=None):
+        """
+        Replace wxmpl.FigurePrinter.printFigure method - fails in
+        version 1.2.9 because FigurePrintout is missing method HasPage
+        """
+        pdData = wx.PrintDialogData()
+        pdData.SetPrintData(self.printer.pData)
+        printer = wx.Printer(pdData)
+        fpo = MyFigurePrintout(figure, title)
+        if printer.Print(self.printer.view, fpo, True):
+            self.printer.pData = pdData.GetPrintData()
 
     def PageSetup(self):
         """
@@ -844,3 +884,11 @@ class PlotView(PlotPanel):
         Window to unzoom functionality.
         """
         self.director.ZoomOut()
+
+class MyFigurePrintout(FigurePrintout):
+    """
+    Fix for wxmpl.FigurePrinter.printFigure method - fails in
+    version 1.2.9 because FigurePrintout is missing method HasPage
+    """
+    def HasPage(self, page):
+        return page <= 1

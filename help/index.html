@@ -11,11 +11,13 @@
     <li><a href="#draw"><b>draw</b></a> </li>
     <li><a href="#export"><b>export</b></a> </li>
     <li><a href="#freeze"><b>freeze</b></a> </li>
+    <li><a href="#get_data"><b>get_data</b></a> </li>
     <li><a href="#get_figure"><b>get_figure</b></a> </li>
     <li><a href="#get_subplot"><b>get_subplot</b></a> </li>
     <li><a href="#hold"><b>hold</b></a> </li>
     <li><a href="#open_file"><b>open_file</b></a> </li>
     <li><a href="#redo"><b>redo</b></a> </li>
+    <li><a href="#set_scale"><b>set_scale</b></a> </li>
     <li><a href="#undo"><b>undo</b></a> </li>
 </ul>
 <p>
@@ -33,6 +35,8 @@
   <li><a href="#GUIInfo"><b>Info Tool</b></a> </li>
   <li><a href="#GUIZoom"><b>Zoom Tool</b></a> </li>
   <li><a href="#GUIPan"><b>Pan Tool</b></a> </li>
+  <li><a href="#GUIGrid"><b>Grid Tool</b></a> </li>
+  <li><a href="#GUIEdit"><b>Plot Edit Tool</b></a> </li>
   <li><a href="#GUIUserManual"><b>User Manual</b></a> </li>
 </ul>
 </p>
@@ -100,6 +104,18 @@ More information about Python and its syntax is available at the
 </ul>
 </p>
 <p>
+<a name="get_data"></a><b>get_data(index = -1)</b>
+<ul>
+    Returns either data for the indicated subplot or a list of all 
+    data plotted on the graph.  Subplots are ordered starting with 
+    Y1 columns and continuing with Y2 columns.<br />
+    Data for each subplot is returned in a list like:
+    <pre>
+    [[x1, x2, ..., xN], [y2, y2, ..., yN]]
+    </pre>
+</ul>
+</p>
+<p>
 <a name="get_figure"></a><b>get_figure()</b>
 <ul>
     Returns the matplotlib figure object associated with the plotting area. 
@@ -153,6 +169,14 @@ More information about Python and its syntax is available at the
 <a name="redo"></a><b>redo()</b>
 <ul>
     Redoes the last command typed in the interactive shell.
+</ul>
+</p>
+<p>
+<a name="set_scale"></a><b>set_scale(index = 0, xlim = None, ylim = None)</b>
+<ul>
+    Rescale axes of given subplot to limits (xmin, xmax) and (ymin, ymax).
+    If a set of limits is not given, it is set to autoscale.<br />
+    Returns the current limits.
 </ul>
 </p>
 <p>
@@ -265,6 +289,27 @@ simplifies access to the available interactive plot functions.
     to pan around the selected subplot.  Left-clicking the mouse and holding
     the left button down will pan around the subplot.  Right-clicking restores
     the original view.  This functionality is also available via Tools->Pan.
+</ul>
+</p>
+<p><a name="GUIGrid"></a><img src="Grid.bmp"><b>Grid Tool</b>
+<ul>
+    Selecting the grid tool turns on the plot grid.  This functionality is
+    also available via Tools->Grid.
+</ul>
+</p>
+<p><a name="GUIEdit"></a><img src="PlotEdit.bmp"><b>Plot Edit Tool</b>
+<ul>
+    Selecting the plot edit tool allows the user to edit plot labels, colors,
+    and title.  Clicking on "Advanced Options" brings up an additional dialog
+    which contains options for transparency, legend placement, and ordering of
+    plots.<br />
+    Colors may be entered as hex codes or selected by clicking on the colored
+    button to the right of the text field.  Plots can only be reordered within
+    their subplot - i.e., Y1 lines will always be below Y2 lines.  Legend
+    location can be specified with simple strings (e.g., "upper right") or
+    coordinates 0-1 along the plot edges.  If a string is chosen it will be
+    used in place of any coordinates.<br />
+    This functionality is also available via Tools->Edit Plot.
 </ul>
 </p>
 <p><a name="GUIUserManual"></a><img src="UserManual.bmp"><b>User Manual</b>
@@ -446,6 +491,27 @@ options File, Edit, View, Tools, and Help.
         the toolbar.
     </ul>
     <p>
+    <b>Grid</b>
+    <ul>
+        Selecting the grid tool turns on the plot grid.  This functionality can
+        also be found in the toolbar.
+    </ul>
+    <p>
+    <b>Edit Plot</b>
+    <ul>
+        Selecting the plot edit tool allows the user to edit plot labels, colors,
+        and title.  Clicking on "Advanced Options" brings up an additional dialog
+        which contains options for transparency, legend placement, and ordering of
+        plots.<br />
+        Colors may be entered as hex codes or selected by clicking on the colored
+        button to the right of the text field.  Plots can only be reordered within
+        their subplot - i.e., Y1 lines will always be below Y2 lines.  Legend
+        location can be specified with simple strings (e.g., "upper right") or
+        coordinates 0-1 along the plot edges.  If a string is chosen it will be
+        used in place of any coordinates.<br />
+        This functionality can also be found in the toolbar.
+    </ul>
+    <p>
     <b>Options</b>
     <ul>
         Displays a dialog which allows the user to control various plotting
@@ -463,8 +529,7 @@ options File, Edit, View, Tools, and Help.
     <p>
     <b>User Manual</b>
     <ul>
-        Displays this document.  
-        This functionality can also be found in the Help menu.
+        Displays this document.
     </ul>
     <p>
     <b>Tutorial</b>

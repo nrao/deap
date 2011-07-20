@@ -25,13 +25,14 @@ FUNCTIONS = [
   , "draw"        # repeat of pylab function (draw)
   , "export"      # repeat of pylab function (savefig)
   , "freeze"
+  , "get_data"
   , "get_figure"  # repeat of pylab function (gcf)
   , "get_subplot" # repeat of pylab function (gca)
   , "hold"        # repeat of pylab function (hold)
   , "open_file"   # should just be execfile
   , "redo"
+  , "set_scale"
   , "undo"
-  , "get_data"
 ]
 
 class Interpreter:
@@ -191,7 +192,7 @@ class Interpreter:
         "Undoes the last command typed in the interactive shell."
         self.GetDocument().Undo()
 
-    def get_data(self, index=None):
+    def get_data(self, index=-1):
         """
         Returns either data for the indicated subplot or a list of all 
         data plotted on the graph.  Subplots are ordered starting with 
@@ -206,6 +207,25 @@ class Interpreter:
             for line in axes.lines:
                 data.append([line.get_xdata(), line.get_ydata()])
                 j +=1
-        if index:
-            return data[j]
+        if index > -1:
+            return data[index]
         return data
+
+    def set_scale(self, index=0, xlim=None, ylim=None, autoscale=True):
+        """
+        Rescale axes of given subplot to limits (xmin, xmax) and (ymin, ymax).
+        If a set of limits is not given, defaults to autoscale.
+        Returns the current limits.
+        """
+        subplot = self.get_subplot(index)
+        
+        if autoscale:       subplot.autoscale_view()
+        
+        if xlim is None:    xlim = subplot.get_xlim()
+        if ylim is None:    ylim = subplot.get_ylim()
+        
+        # Add to zoom history
+        self.GetDocument().GetPlotter().director.limits.set(subplot, xlim, ylim)
+        self.GetDocument().draw()
+        
+        return subplot.get_xlim(), subplot.get_ylim()
