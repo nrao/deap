@@ -32,6 +32,7 @@ class PlotEditFrame(wx.Frame):
         self.plot = plot
         self.figure = plot.get_figure()
         self.advanced_options = None
+        self.scroll = wx.ScrolledWindow(self, -1)
         self.InitControls()
     
     def InitControls(self):
@@ -66,16 +67,16 @@ class PlotEditFrame(wx.Frame):
         
         self.axesCtrls = [(tLbl,tTxt), (xLbl,xTxt), (y1Lbl,y1Txt), (y2Lbl,y2Txt)]
         
-        self.lineCtrls = [( wx.StaticText(self, -1, "Column:"),
-                            wx.StaticText(self, -1, "Color:"),
-                            wx.StaticText(self, -1, ""))]
+        self.lineCtrls = [( wx.StaticText(self.scroll, -1, "Column:"),
+                            wx.StaticText(self.scroll, -1, "Color:"),
+                            wx.StaticText(self.scroll, -1, ""))]
         
         for axis in self.figure.axes:
             for line in axis.lines:
                 color = self.MplToWxColour(line.get_color())
-                lineTxt = wx.TextCtrl(self, -1, line.get_label(), size=(175,-1))
-                lineColor = wx.TextCtrl(self, -1, "#%02x%02x%02x"%color.Get())
-                lineBtn = wx.Button(self, -1, size=(25,25))
+                lineTxt = wx.TextCtrl(self.scroll, -1, line.get_label(), size=(175,-1))
+                lineColor = wx.TextCtrl(self.scroll, -1, "#%02x%02x%02x"%color.Get())
+                lineBtn = wx.Button(self.scroll, -1, size=(25,25))
                 lineBtn.SetBackgroundColour(color)
                 self.Bind(wx.EVT_BUTTON, self.OnColor, lineBtn)
                 self.Bind(wx.EVT_TEXT, self.OnColorChange, lineColor)
@@ -102,13 +103,15 @@ class PlotEditFrame(wx.Frame):
         
         lineBox = wx.StaticBox(self, -1, "Lines")
         lineBoxSizer = wx.StaticBoxSizer(lineBox, wx.VERTICAL)
-        lineSizer = wx.FlexGridSizer(rows=len(self.lineCtrls)+1, cols=3, vgap=3, hgap=3)
+        lineSizer = wx.FlexGridSizer(rows=len(self.lineCtrls)+1, cols=4, vgap=3, hgap=3)
         for ctrls in self.lineCtrls:
             lineSizer.AddMany([(ctrls[0], 0, wx.ALIGN_LEFT | wx.EXPAND),
                                (ctrls[1], 0, wx.ALIGN_LEFT),
-                               (ctrls[2], 0, wx.ALIGN_CENTER| wx.FIXED_MINSIZE)])
+                               (ctrls[2], 0, wx.ALIGN_CENTER| wx.FIXED_MINSIZE),
+                               ((3,3),    0, wx.ALIGN_CENTER)])
         lineSizer.AddGrowableCol(0)
-        lineBoxSizer.Add(lineSizer, 0, wx.EXPAND)
+        self.scroll.SetSizer(lineSizer)
+        lineBoxSizer.Add(self.scroll, 0, wx.EXPAND)
         
         controlSizer = wx.BoxSizer(wx.HORIZONTAL)
         controlSizer.AddMany([(self.updateBtn, 1, wx.ALIGN_CENTER | wx.EXPAND),
@@ -119,13 +122,22 @@ class PlotEditFrame(wx.Frame):
                           (self.advancedBtn, 0, wx.EXPAND),
                           (controlSizer, 0, wx.EXPAND)])
         
+        width = self.scroll.GetBestSize().width
+        height = self.scroll.GetBestSize().height
+        if height > 400:
+            height = 400
+            width = width + 25 # button size
+        self.scroll.SetSize((width, height))
+        self.scroll.SetScrollbars(0, 1, width, height)
+        
         self.SetSizer(boxSizer)
         self.SetAutoLayout(1)
         self.Fit()
         
-        size = self.GetBestSize()
-        self.SetSizeHints(minH=size.GetHeight(), maxH=size.GetHeight(),
-                          minW=size.GetWidth(), maxW=size.GetWidth()*5)
+        height = self.GetSize().GetHeight()
+        self.SetSizeHints(minH=height, maxH=height,
+                                minW=width, maxW=width*5)
+        
 
     def OnUpdate(self, event):
         """Update the plot"""
@@ -267,7 +279,10 @@ class PlotEditFrame(wx.Frame):
         lineBoxes = []
         self.advanced_options = {'legendCtrls':[], 'lineCtrls':[]}
         i = 1
+        scrolls = []
         for axis in self.figure.axes:
+            advscroll = wx.ScrolledWindow(dialog, -1)
+            scrolls.append(advscroll)
             albl = wx.StaticText(dialog, -1, "Y%s-axis"%i)
             aalpha = wx.SpinCtrl(dialog, -1, style=wx.SP_ARROW_KEYS, min=0, max=100,
                                  initial=axis.get_legend().get_frame().get_alpha()*100,
@@ -291,19 +306,19 @@ class PlotEditFrame(wx.Frame):
             lineBoxSizer = wx.StaticBoxSizer(lineBox, wx.VERTICAL)
             lineGridSizer = wx.FlexGridSizer(rows=len(axis.lines)+1, cols=4, vgap=3, hgap=3)
             lineGridSizer.AddMany([((-1,-1), 0),
-                                   (wx.StaticText(dialog, -1, "Transparency"), 0, wx.ALIGN_CENTER),
-                                   (wx.StaticText(dialog, -1, "Order"), 0, wx.ALIGN_CENTER),
+                                   (wx.StaticText(advscroll, -1, "Transparency"), 0, wx.ALIGN_CENTER),
+                                   (wx.StaticText(advscroll, -1, "Order"), 0, wx.ALIGN_CENTER),
                                    ((-1,-1), 0)])
             i += 1
             for line in axis.lines:
                 lbltxt = line.get_label()
                 if len(lbltxt)>40:
                     lbltxt = line.get_label()[:37]+"..."
-                lbl = wx.StaticText(dialog, -1, lbltxt, style=wx.ALIGN_RIGHT | wx.ST_NO_AUTORESIZE)
-                alphabox = wx.SpinCtrl(dialog, -1, style=wx.SP_ARROW_KEYS, min=0,
+                lbl = wx.StaticText(advscroll, -1, lbltxt, style=wx.ALIGN_RIGHT | wx.ST_NO_AUTORESIZE)
+                alphabox = wx.SpinCtrl(advscroll, -1, style=wx.SP_ARROW_KEYS, min=0,
                                        max=100, initial=line.get_alpha()*100,
                                        size=(75,-1))
-                zorderbox = wx.TextCtrl(dialog, -1, str(line.get_zorder()), size=(30,-1))
+                zorderbox = wx.TextCtrl(advscroll, -1, str(line.get_zorder()), size=(30,-1))
                 lineGridSizer.AddMany([(lbl, 0, wx.ALIGN_RIGHT | wx.EXPAND),
                                        (alphabox, 0, wx.ALIGN_CENTER),
                                        (zorderbox, 0, wx.ALIGN_CENTER),
@@ -311,9 +326,9 @@ class PlotEditFrame(wx.Frame):
                 self.advanced_options["lineCtrls"].append((alphabox, zorderbox))
             
             lineGridSizer.AddGrowableCol(0)
-            #lineGridSizer.AddGrowableCol(1)
             lineGridSizer.AddGrowableCol(3)
-            lineBoxSizer.Add(lineGridSizer, 0, wx.EXPAND | wx.ALL)
+            advscroll.SetSizer(lineGridSizer)
+            lineBoxSizer.Add(advscroll, 0, wx.EXPAND | wx.ALL)
             lineBoxes.append(lineBoxSizer)
         
         legendBoxSizer.Add(legendGridSizer, 0, wx.EXPAND | wx.ALL)
@@ -332,6 +347,13 @@ class PlotEditFrame(wx.Frame):
         for linebox in lineBoxes:
             boxSizer.Add(linebox, 0, wx.EXPAND | wx.ALL)
         boxSizer.Add(controlSizer, 0, wx.EXPAND | wx.ALL)
+        
+        for advscroll in scrolls:
+            width = advscroll.GetBestSize().width
+            height = min(advscroll.GetBestSize().height, 250)
+            advscroll.SetSize((width, height))
+            advscroll.SetScrollbars(0, 1, width, height)
+        
         dialog.SetSizer(boxSizer)
         dialog.SetAutoLayout(1)
         dialog.Fit()

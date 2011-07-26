@@ -485,8 +485,8 @@ class MyPlotPanelDirector(PlotPanelDirector):
         for ax in axes:
             i += 1
             xdata, ydata = get_data(ax, x, y)
-            xi = ax.format_xdata(xdata)
-            yi = ax.format_ydata(ydata)
+            xi = ax.format_xdata(xdata).replace("\n"," ")
+            yi = ax.format_ydata(ydata).replace("\n"," ")
             coordstr += "\nx%s=%s,\ty%s=%s"%(i, xi, i, yi)
         self.view.location.set(coordstr[1:])
 
